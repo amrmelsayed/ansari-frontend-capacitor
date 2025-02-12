@@ -1,0 +1,42 @@
+name: Staging Deployment
+
+on:
+  push:
+    branches:
+      - deployment-testing
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 🏗 Setup repo
+        uses: actions/checkout@v3
+
+      - name: 🏗 Setup Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18.x
+          cache: yarn
+
+      - name: 🏗 Setup EAS
+        uses: expo/expo-github-action@v8
+        with:
+          eas-version: latest
+          token: ${{ secrets.EXPO_TOKEN }}
+
+      - name: 📦 Install dependencies
+        run: yarn install
+
+      - name: 🏗 Pull in environment variables
+        run: eas env:pull preview
+
+      - name: 🏗 Build
+        run: yarn build
+
+      - name: 🚀 Publish to Cloudflare Pages
+        uses: cloudflare/pages-action@v1
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          projectName: 'staging-ansari-chat'
+          directory: dist
+          gitHubToken: ${{ secrets.GITHUB_TOKEN }}
