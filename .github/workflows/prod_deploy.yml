@@ -1,13 +1,13 @@
-name: Staging Deployment
+name: Production Deployment
 
 on:
   push:
     branches:
-      - vercel-testing-staging
+      - vercel-testing-prod
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
-    environment: staging
+    environment: production
     env:
       VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
       VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
@@ -37,7 +37,7 @@ jobs:
         run: vercel pull --yes --environment=production --token=${{ secrets.VERCEL_TOKEN }}
 
       - name: 🏗 Pull in environment variables
-        run: eas env:pull preview
+        run: eas env:pull production
 
       - name: 🏗 Build
         run: vercel build --token=${{ secrets.VERCEL_TOKEN }}
